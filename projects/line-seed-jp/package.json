@@ -5,7 +5,7 @@
     "files": [
         "fonts",
         "LICENSE",
-        "LINESeedJP.css"
+        "index.css"
     ],
     "license":"OFL-1.1",
     "repository":{
