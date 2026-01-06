@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "@yodogawa404/line-seed-jp",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "files": [
         "fonts",
         "LICENSE",
