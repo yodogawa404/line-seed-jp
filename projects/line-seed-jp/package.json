@@ -5,7 +5,9 @@
     "files": [
         "fonts",
         "LICENSE",
-        "index.css"
+        "index.css",
+        "hiragana.css",
+        "katakana.css"
     ],
     "license": "OFL-1.1",
     "repository": {

@@ -1,7 +1,7 @@
 import unicode_ranges from "@yodogawa404/get-unicode-chunk-range_jp/jp.json" with { type: "json" };
 
 import { writeFileSync } from "node:fs";
-import { execFile } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 const source_fonts = {
   100: "../../resources/OTF/LINESeedJP_A_OTF_Th.otf",
@@ -35,7 +35,7 @@ let woff2FileUnicodeList = {};
       const distFileName = `LINESeedJP_${key}-${String(i_unicode).padStart(3, "0")}`;
       const distFileExt = ".otf";
       console.log(
-        execFile("hb-subset", [
+        execFileSync("hb-subset", [
           source_fonts[key],
           `--unicodes=${unicodes}`,
           "--layout-features=*",
@@ -55,8 +55,8 @@ let woff2FileUnicodeList = {};
 
 {
   Object.keys(distFileNames).map((key) => {
-    console.log(execFile("woff2_compress", [distFileNames[key]]));
-    console.log(execFile("rm", [distFileNames[key]]));
+    console.log(execFileSync("woff2_compress", [distFileNames[key]]));
+    console.log(execFileSync("rm", [distFileNames[key]]));
   });
 }
 {
@@ -68,4 +68,85 @@ let woff2FileUnicodeList = {};
   });
 
   writeFileSync("../line-seed-jp/index.css", full_css);
+}
+
+{
+  const hiraganaUnicodeRange = "U+3041-309E";
+  const katakanaUnicodeRange = "U+30A1-30FA";
+
+  let hiraganaOTFFileList = [];
+  let katakanaOTFFileList = [];
+
+  let hiraganaWoff2FileList = [];
+  let katakanaWoff2FileList = [];
+
+  Object.keys(source_fonts).map((key) => {
+    const distDirName = "../line-seed-jp/fonts/";
+    const distFileName = `LINESeedJP_${key}-hiragana`;
+    const distFileExt = ".otf";
+
+    console.log(
+      execFileSync("hb-subset", [
+        source_fonts[key],
+        `--unicodes=${hiraganaUnicodeRange}`,
+        "--layout-features=*",
+        `--output-file=${distDirName + distFileName + distFileExt}`,
+      ]),
+    );
+
+    hiraganaOTFFileList.push(distDirName + distFileName + distFileExt);
+    hiraganaWoff2FileList.push({
+      filename: distFileName + ".woff2",
+      weight: key,
+      unicodeRange: hiraganaUnicodeRange,
+    });
+  });
+
+  Object.keys(source_fonts).map((key) => {
+    const distDirName = "../line-seed-jp/fonts/";
+    const distFileName = `LINESeedJP_${key}-katakana`;
+    const distFileExt = ".otf";
+
+    console.log(
+      execFileSync("hb-subset", [
+        source_fonts[key],
+        `--unicodes=${katakanaUnicodeRange}`,
+        "--layout-features=*",
+        `--output-file=${distDirName + distFileName + distFileExt}`,
+      ]),
+    );
+
+    katakanaOTFFileList.push(distDirName + distFileName + distFileExt);
+    katakanaWoff2FileList.push({
+      filename: distFileName + ".woff2",
+      weight: key,
+      unicodeRange: katakanaUnicodeRange,
+    });
+  });
+
+  for (let i = 0; i < hiraganaOTFFileList.length; i++) {
+    console.log(execFileSync("woff2_compress", [hiraganaOTFFileList[i]]));
+    console.log(execFileSync("rm", [hiraganaOTFFileList[i]]));
+  }
+
+  for (let i = 0; i < katakanaOTFFileList.length; i++) {
+    console.log(execFileSync("woff2_compress", [katakanaOTFFileList[i]]));
+    console.log(execFileSync("rm", [katakanaOTFFileList[i]]));
+  }
+
+  let hiraganaFullCss = "";
+  for (let i = 0; i < hiraganaWoff2FileList.length; i++) {
+    hiraganaFullCss =
+      hiraganaFullCss +
+      `@font-face {font-family: 'LINE Seed JP';font-display: swap;font-weight: ${hiraganaWoff2FileList[i]["weight"]};src: url(./fonts/${hiraganaWoff2FileList[i]["filename"]}) format('woff2');unicode-range: ${hiraganaWoff2FileList[i]["unicodeRange"]};}\n`;
+  }
+  writeFileSync("../line-seed-jp/hiragana.css", hiraganaFullCss);
+
+  let katakanaFullCss = "";
+  for (let i = 0; i < katakanaWoff2FileList.length; i++) {
+    katakanaFullCss =
+      katakanaFullCss +
+      `@font-face {font-family: 'LINE Seed JP';font-display: swap;font-weight: ${katakanaWoff2FileList[i]["weight"]};src: url(./fonts/${katakanaWoff2FileList[i]["filename"]}) format('woff2');unicode-range: ${katakanaWoff2FileList[i]["unicodeRange"]};}\n`;
+  }
+  writeFileSync("../line-seed-jp/katakana.css", katakanaFullCss);
 }
