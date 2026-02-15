@@ -4,10 +4,8 @@ import { writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const source_fonts = {
-  100: "../../resources/OTF/LINESeedJP_A_OTF_Th.otf",
   400: "../../resources/OTF/LINESeedJP_A_OTF_Rg.otf",
   700: "../../resources/OTF/LINESeedJP_A_OTF_Bd.otf",
-  800: "../../resources/OTF/LINESeedJP_A_OTF_Eb.otf",
 };
 
 let distFileNames = {};
